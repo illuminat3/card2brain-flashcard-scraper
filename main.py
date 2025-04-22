@@ -142,17 +142,13 @@ def main():
         return
 
     folder = f"flashcards_{unit_code}"
-    fragen = os.path.join(folder, "fragen")
-    antworten = os.path.join(folder, "antworten")
-    os.makedirs(fragen, exist_ok=True)
-    os.makedirs(antworten, exist_ok=True)
+    os.makedirs(folder, exist_ok=True)
 
     for i, (q, a) in enumerate(zip(all_questions, all_answers)):
-        draw_flashcard(q, os.path.join(fragen, f"{i + 1}f.png"))
-        draw_flashcard(a, os.path.join(antworten, f"{i + 1}a.png"))
+        draw_flashcard(q, os.path.join(folder, f"{i + 1}f.png"))
+        draw_flashcard(a, os.path.join(folder, f"{i + 1}a.png"))
 
-    print(f"\nDone! Saved {len(all_questions)} flashcards in: {folder}")
-
+        print(f"\nDone! Saved {len(all_questions)} flashcards in: {folder}")
 
 if __name__ == "__main__":
     main()
