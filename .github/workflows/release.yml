@@ -1,0 +1,59 @@
+name: Build and Release Flashcard Scraper
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.py'
+      - 'chromedriver.exe'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller beautifulsoup4 pillow selenium
+
+    - name: Build with PyInstaller
+      run: |
+        pyinstaller --onefile --name flashcard-scraper --add-binary "chromedriver.exe;." main.py
+
+    - name: Get latest tag
+      id: get_tag
+      run: |
+        git fetch --tags
+        $tags = git tag --sort=-v:refname
+        $latest = ($tags | Where-Object { $_ -match '^v1\.0\.\d+$' } | Select-Object -First 1)
+        if ($latest) {
+          $parts = $latest -split '\.'
+          $patch = [int]$parts[2] + 1
+        } else {
+          $patch = 0
+        }
+        echo "version=v1.0.$patch" >> $env:GITHUB_ENV
+
+    - name: Create Git tag
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git tag $env:version
+        git push origin $env:version
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ env.version }}
+        name: Release ${{ env.version }}
+        files: dist/flashcard-scraper.exe
