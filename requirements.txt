@@ -1,0 +1,4 @@
+pyinstaller
+beautifulsoup4
+pillow
+selenium
