@@ -8,6 +8,8 @@ on:
       - '**.py'
       - 'chromedriver.exe'
       - 'requirements.txt'
+      
+  workflow_dispatch:
 
 jobs:
   build:
