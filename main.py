@@ -20,7 +20,6 @@ def get_base_path():
 def get_driver():
     options = Options()
     options.add_argument("--start-maximized")
-
     options.add_argument("--log-level=3")
     options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
@@ -38,7 +37,6 @@ def wait_for_cards_to_load(driver):
     except:
         return False
 
-
 def extract_flashcards_from_html(html):
     soup = BeautifulSoup(html, "html.parser")
     cards = soup.select("div.bg-white.p-1.mb-4")
@@ -55,7 +53,6 @@ def extract_flashcards_from_html(html):
             answers.append(answer)
             print(f"Q: {question} -> A: {answer}")
     return questions, answers
-
 
 def draw_flashcard(text, output_path):
     width, height = 800, 400
@@ -85,14 +82,12 @@ def draw_flashcard(text, output_path):
 
     image.save(output_path)
 
-
 def extract_unit_code(url: str):
     parsed = urlparse(url)
     path_parts = parsed.path.strip("/").split("/")
     if len(path_parts) >= 2 and path_parts[0] in ["box", "cards"]:
         return path_parts[1]
     return None
-
 
 def main():
     driver = get_driver()
@@ -148,7 +143,15 @@ def main():
         draw_flashcard(q, os.path.join(folder, f"{i + 1}f.png"))
         draw_flashcard(a, os.path.join(folder, f"{i + 1}a.png"))
 
-        print(f"\nDone! Saved {len(all_questions)} flashcards in: {folder}")
+    print(f"\nDone! Saved {len(all_questions)} flashcards in: {folder}")
+
+    text_output_path = os.path.join(folder, "flashcards.txt")
+    with open(text_output_path, "w", encoding="utf-8") as f:
+        for i, (q, a) in enumerate(zip(all_questions, all_answers)):
+            f.write(f"{i + 1}F: {q}\n")
+            f.write(f"{i + 1}A: {a}\n\n")
+
+    print(f"Saved all flashcards in text format: {text_output_path}")
 
 if __name__ == "__main__":
     main()
